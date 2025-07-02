@@ -2,9 +2,7 @@
 
 Welcome to the **Glamnail Studio** project! This website is developed by **Group 5**, consisting of four dedicated team members, as part of our academic project. The platform allows users to **book nail services appointments** with options for **walk-in or home service**.
 
----
-
-## 🌐 Website Overview
+## Website Overview
 
 Glamnail Studio is designed to offer convenient and professional nail care services, including:
 
@@ -15,26 +13,20 @@ Glamnail Studio is designed to offer convenient and professional nail care servi
 
 Our focus is on **streamlined appointment booking**, where customers can choose their preferred service type and service location (walk-in or home).
 
----
-
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **Frontend**: HTML, CSS, JavaScript
 - **Backend**: PHP
 - **Database**: MySQL
 
----
-
-## ✨ Key Features
+## Key Features
 
 - User-friendly appointment booking form
 - Service type and location selection (walk-in or home)
 - Responsive design for different devices
 - Database integration to store appointment records
 
----
-
-## 📁 Project Structure
+## Project Structure
 
 glamnail-studio/
 ├── index.html
@@ -51,7 +43,7 @@ glamnail-studio/
 └── database.sql
 
 
-## 📌 Future Enhancements
+## Future Enhancements
 
 - User login and profile
 - Admin dashboard to manage bookings
