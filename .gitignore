@@ -1,0 +1,28 @@
+# === Composer ===
+vendor/
+composer.lock
+
+# === Environment Configuration ===
+.env
+.env.*
+
+# === Logs and Cache ===
+*.log
+*.cache
+*.tmp
+
+# === System Files ===
+.DS_Store
+Thumbs.db
+
+# === VS Code or PHPStorm ===
+.vscode/
+.idea/
+
+# === OS-Specific Files ===
+ehthumbs.db
+desktop.ini
+
+# === Node-related (if any frontend build) ===
+node_modules/
+dist/

@@ -26,6 +26,7 @@ $messages = $stmt->fetchAll();
 </head>
 
 <body class="bg-light">
+    <?php include '../includes/admin_navbar.php'; ?>
     <div class="container py-5">
         <div class="card shadow p-4">
             <h2 class="text-center mb-4">User Messages</h2>

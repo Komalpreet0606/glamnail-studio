@@ -1,16 +1,6 @@
 <?php
-include '../includes/session.php';
 include '../includes/db.php';
-
-// Redirect if not admin
-if ($_SESSION['role'] !== 'admin') {
-    header('Location: ../index.php');
-    exit();
-}
-
-// Fetch all discounts
-$stmt = $pdo->query('SELECT * FROM discounts ORDER BY valid_from DESC');
-$discounts = $stmt->fetchAll();
+$discounts = $pdo->query('SELECT * FROM discounts ORDER BY id DESC')->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -23,67 +13,45 @@ $discounts = $stmt->fetchAll();
 </head>
 
 <body class="bg-light">
+    <?php include '../includes/admin_navbar.php'; ?>
 
-    <div class="container py-5">
-        <div class="card shadow p-4">
-            <h2 class="mb-4 text-center">Manage Discount Offers</h2>
+    <div class="container my-5">
+        <div class="bg-white p-4 rounded shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="text-primary">🎁 Manage Discounts</h3>
+                <a href="add_discount.php" class="btn btn-success">➕ Add Discount</a>
+            </div>
 
-            <h4>Add New Discount</h4>
-            <form action="../actions/add_discount.php" method="POST" class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <input type="text" name="title" class="form-control" placeholder="Discount Title" required>
-                </div>
-                <div class="col-md-3">
-                    <input type="number" name="percentage" class="form-control" placeholder="Percentage (%)" required>
-                </div>
-                <div class="col-md-3 d-grid">
-                    <button type="submit" class="btn btn-primary">Add Offer</button>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Valid From:</label>
-                    <input type="date" name="valid_from" class="form-control" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Valid To:</label>
-                    <input type="date" name="valid_to" class="form-control" required>
-                </div>
-            </form>
-
-            <h4>Current Discounts</h4>
-            <table class="table table-striped table-bordered mt-3">
+            <table class="table table-bordered align-middle">
                 <thead class="table-dark">
                     <tr>
                         <th>ID</th>
                         <th>Title</th>
-                        <th>% Off</th>
+                        <th>Percentage</th>
                         <th>Valid From</th>
                         <th>Valid To</th>
-                        <th>Action</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($discounts as $d): ?>
                     <tr>
                         <td><?= $d['id'] ?></td>
-                        <td><?= $d['title'] ?></td>
+                        <td><?= htmlspecialchars($d['title']) ?></td>
                         <td><?= $d['percentage'] ?>%</td>
                         <td><?= $d['valid_from'] ?></td>
                         <td><?= $d['valid_to'] ?></td>
                         <td>
+                            <a href="edit_discount.php?id=<?= $d['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
                             <a href="../actions/delete_discount.php?id=<?= $d['id'] ?>" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Delete this offer?')">Delete</a>
+                                onclick="return confirm('Delete this discount?')">Delete</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
-
-            <div class="text-center mt-3">
-                <a href="admin.php" class="btn btn-secondary">← Back to Dashboard</a>
-            </div>
         </div>
     </div>
-
 </body>
 
 </html>

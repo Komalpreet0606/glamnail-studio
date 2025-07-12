@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include 'includes/db.php';
 $today = date('Y-m-d');
 $stmt = $pdo->prepare('SELECT * FROM discounts WHERE valid_from <= ? AND valid_to >= ?');
@@ -14,14 +17,47 @@ $offers = $stmt->fetchAll();
     <title>GlamNail Studio - Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato&display=swap"
+        rel="stylesheet">
+    <link rel="preload" as="image" href="images/home-banner.jpg">
+
+    <!-- AOS Animation CSS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #fffafc;
+            font-family: 'Lato', sans-serif;
+            color: #333;
+            background-color: #fffafc;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Playfair Display', serif;
+            color: #b76e79;
+        }
+
+        .btn-primary {
+            background-color: #b76e79;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #a05566;
+        }
+
+        .section-padding {
+            padding: 80px 20px;
         }
 
         .hero {
-            background: url('images/banner3.webp') center/cover no-repeat;
+            background: url('images/home-banner.jpg') center/cover no-repeat;
             height: 85vh;
             color: white;
             display: flex;
@@ -30,6 +66,37 @@ $offers = $stmt->fetchAll();
             flex-direction: column;
             text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            transform: scale(1.1);
+            animation: kenburns 20s ease-in-out infinite alternate;
+            z-index: 0;
+            filter: brightness(0.8);
+        }
+
+        .hero>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes kenburns {
+            0% {
+                transform: scale(1.05) translate(0, 0);
+            }
+
+            100% {
+                transform: scale(1.2) translate(-2%, -2%);
+            }
         }
 
         .section-title {
@@ -66,29 +133,66 @@ $offers = $stmt->fetchAll();
         .btn-cta:hover {
             background: linear-gradient(to right, #e75da8, #b158a1);
         }
+
+        .service-card {
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .service-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .gallery img {
+            object-fit: cover;
+            height: 200px;
+            width: 100%;
+            border-radius: 8px;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .gallery img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .cta-box {
+            background: linear-gradient(to right, #ffe1ef, #fad1ea);
+            border: 1px solid #f3c7de;
+            box-shadow: 0 8px 24px rgba(183, 110, 121, 0.1);
+        }
+
+        .btn-cta {
+            background: linear-gradient(to right, #ff8abf, #d669b5);
+            border: none;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(214, 105, 181, 0.4);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-cta:hover {
+            background: linear-gradient(to right, #e75da8, #b158a1);
+            box-shadow: 0 6px 18px rgba(214, 105, 181, 0.6);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 
 <body>
 
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">GlamNail Studio</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a href="index.php" class="nav-link active">Home</a></li>
-                    <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
-                    <li class="nav-item"><a href="booking.php" class="nav-link">Book Now</a></li>
-                    <li class="nav-item"><a href="support.php" class="nav-link">Support</a></li>
-                    <li class="nav-item"><a href="auth/login.php" class="nav-link">Login</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php include 'includes/navbar.php'; ?>
 
     <!-- HERO -->
     <section class="hero">
@@ -98,7 +202,7 @@ $offers = $stmt->fetchAll();
     </section>
 
     <!-- OFFERS -->
-    <div class="container py-5">
+    <div class="container py-5" data-aos="fade-up">
         <h2 class="text-center section-title">🎁 Special Offers</h2>
         <?php if (count($offers) > 0): ?>
         <div class="row justify-content-center">
@@ -117,30 +221,31 @@ $offers = $stmt->fetchAll();
     </div>
 
     <!-- FEATURED SERVICES -->
-    <div class="container services-preview mb-5">
+    <div class="container services-preview mb-5" data-aos="fade-up">
         <h2 class="text-center section-title">💎 Featured Services</h2>
         <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <img src="images/MeniandPedi.png" class="card-img-top" alt="Mani Pedi">
+            <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
+                <div class="card h-100 service-card">
+
+                    <img src="images/MeniandPedi.png" class="card-img-top" alt="Mani Pedi" loading="lazy">
                     <div class="card-body">
                         <h5 class="card-title">Manicure & Pedicure</h5>
                         <p class="card-text">A relaxing and rejuvenating treatment for hands and feet.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <img src="images/Shellac.png" class="card-img-top" alt="Shellac">
+            <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
+                <div class="card h-100 service-card">
+                    <img src="images/Shellac.png" class="card-img-top" alt="Shellac" loading="lazy">
                     <div class="card-body">
                         <h5 class="card-title">Shellac Nails</h5>
                         <p class="card-text">Glossy, long-lasting nails with UV protection and shine.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <img src="images/Pedicure.png" class="card-img-top" alt="Nail Art">
+            <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
+                <div class="card h-100 service-card">
+                    <img src="images/Pedicure.png" class="card-img-top" alt="Nail Art" loading="lazy">
                     <div class="card-body">
                         <h5 class="card-title">Creative Nail Art</h5>
                         <p class="card-text">Stand out with personalized nail designs & brush art.</p>
@@ -154,7 +259,7 @@ $offers = $stmt->fetchAll();
     </div>
 
     <!-- WHY US -->
-    <div class="container my-5">
+    <div class="container my-5" data-aos="fade-up">
         <h2 class="text-center section-title">🌟 Why GlamNail?</h2>
         <div class="row text-center">
             <div class="col-md-4">
@@ -176,44 +281,65 @@ $offers = $stmt->fetchAll();
     </div>
 
     <!-- TESTIMONIALS -->
-    <div class="container py-5">
+    <div class="container py-5" data-aos="fade-up">
         <h2 class="text-center section-title">💬 What Clients Say</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="testimonial-card">
-                    <p>“Absolutely loved my nails! So elegant and neat. The artist was so gentle too.”</p>
-                    <strong>- Priya K.</strong>
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+
+                <div class="carousel-item active">
+                    <div class="testimonial-card text-center mx-auto" style="max-width: 600px;">
+                        <p>“Absolutely loved my nails! So elegant and neat. The artist was so gentle too.”</p>
+                        <strong>- Priya K.</strong>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="testimonial-card">
-                    <p>“Great vibes, clean studio, and my nail art turned out amazing. Highly recommend!”</p>
-                    <strong>- Harleen M.</strong>
+
+                <div class="carousel-item">
+                    <div class="testimonial-card text-center mx-auto" style="max-width: 600px;">
+                        <p>“Great vibes, clean studio, and my nail art turned out amazing. Highly recommend!”</p>
+                        <strong>- Harleen M.</strong>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="testimonial-card">
-                    <p>“I keep coming back every month. Affordable and high-class service every time.”</p>
-                    <strong>- Ayesha R.</strong>
+
+                <div class="carousel-item">
+                    <div class="testimonial-card text-center mx-auto" style="max-width: 600px;">
+                        <p>“I keep coming back every month. Affordable and high-class service every time.”</p>
+                        <strong>- Ayesha R.</strong>
+                    </div>
                 </div>
+
             </div>
+
+            <!-- Carousel controls -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel"
+                data-bs-slide="prev">
+                <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel"
+                data-bs-slide="next">
+                <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
     </div>
 
+
     <!-- GALLERY -->
-    <div class="container my-5">
+    <div class="container my-5" data-aos="fade-up">
         <h2 class="text-center section-title">📸 Our Gallery</h2>
         <div class="row gallery g-3">
-            <div class="col-md-3"><img src="images/gallery1.jpg" alt="Design 1"></div>
-            <div class="col-md-3"><img src="images/gallery2.jpg" alt="Design 2"></div>
-            <div class="col-md-3"><img src="images/gallery3.jpg" alt="Design 3"></div>
-            <div class="col-md-3"><img src="images/gallery4.jpg" alt="Design 4"></div>
+            <div class="col-md-3"><img src="images/gallery_1.jpg" alt="Design 1" loading="lazy"></div>
+            <div class="col-md-3"><img src="images/gallery_2.jpg" alt="Design 2" loading="lazy"></div>
+            <div class="col-md-3"><img src="images/gallery_3.jpg" alt="Design 3" loading="lazy"></div>
+            <div class="col-md-3"><img src="images/gallery_4.jpg" alt="Design 4" loading="lazy"></div>
         </div>
     </div>
 
     <!-- CTA SECTION -->
-    <div class="container text-center my-5">
-        <div class="p-5 bg-light rounded shadow">
+    <div class="container text-center my-5" data-aos="zoom-in">
+        <div class="p-5 cta-box rounded shadow">
+
             <h3 class="fw-bold">Ready to get pampered?</h3>
             <p class="lead">Schedule your next appointment with GlamNail and feel the difference!</p>
             <a href="booking.php" class="btn btn-cta btn-lg mt-2">Book Now</a>
@@ -227,6 +353,23 @@ $offers = $stmt->fetchAll();
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation JS -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const carousel = document.querySelector('#testimonialCarousel');
+            if (carousel) {
+                new bootstrap.Carousel(carousel, {
+                    interval: 5000,
+                    ride: 'carousel'
+                });
+            }
+        });
+    </script>
+
 </body>
 
 </html>

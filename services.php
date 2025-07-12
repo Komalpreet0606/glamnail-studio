@@ -1,7 +1,22 @@
 <?php
+session_start();
 include 'includes/db.php';
-$stmt = $pdo->query('SELECT * FROM services');
+$limit = 6; // services per page
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Get total number of services
+$totalStmt = $pdo->query('SELECT COUNT(*) FROM services');
+$totalServices = $totalStmt->fetchColumn();
+$totalPages = ceil($totalServices / $limit);
+
+// Get paginated services
+$stmt = $pdo->prepare('SELECT * FROM services LIMIT :limit OFFSET :offset');
+$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
 $services = $stmt->fetchAll();
+
 ?>
 
 <!DOCTYPE html>
@@ -12,10 +27,25 @@ $services = $stmt->fetchAll();
     <title>Services - GlamNail Studio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato&display=swap"
+        rel="stylesheet">
+
+    <!-- AOS Animation CSS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <style>
         body {
-            background: #f9f9fb;
-            font-family: 'Segoe UI', sans-serif;
+            background: #fffafc;
+            font-family: 'Lato', sans-serif;
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Playfair Display', serif;
+            color: #b76e79;
         }
 
         .hero {
@@ -57,7 +87,13 @@ $services = $stmt->fetchAll();
             object-fit: cover;
             border-top-left-radius: 12px;
             border-top-right-radius: 12px;
+            transition: transform 0.3s ease;
         }
+
+        .service-card:hover img {
+            transform: scale(1.05);
+        }
+
 
         .badge-price {
             background-color: #d63384;
@@ -98,23 +134,7 @@ $services = $stmt->fetchAll();
 
 <body>
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="index.php">GlamNail Studio</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-                    <li class="nav-item"><a href="services.php" class="nav-link active">Services</a></li>
-                    <li class="nav-item"><a href="booking.php" class="nav-link">Book</a></li>
-                    <li class="nav-item"><a href="support.php" class="nav-link">Support</a></li>
-                    <li class="nav-item"><a href="auth/login.php" class="nav-link">Login</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php include 'includes/navbar.php'; ?>
 
     <!-- HERO SECTION -->
     <section class="hero">
@@ -125,7 +145,7 @@ $services = $stmt->fetchAll();
     </section>
 
     <!-- SECTION INTRO -->
-    <div class="container text-center my-5">
+    <div class="container text-center my-5" data-aos="fade-up">
         <h2 class="fw-bold mb-3">Why Choose GlamNail?</h2>
         <p class="section-description">
             Our certified professionals are passionate about nail artistry. Whether you're looking for a classic
@@ -135,63 +155,89 @@ $services = $stmt->fetchAll();
     </div>
 
     <!-- FILTER BAR (STATIC PLACEHOLDER) -->
-    <div class="container">
+    <div class="container" data-aos="fade-up">
         <div class="filter-bar shadow-sm d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <input type="text" class="form-control w-25" placeholder="Search services...">
-            <select class="form-select w-25">
-                <option selected>Category</option>
-                <option>Manicure</option>
-                <option>Pedicure</option>
-                <option>Extensions</option>
+            <input type="text" id="searchInput" class="form-control w-25" placeholder="Search services...">
+
+            <select id="categorySelect" class="form-select w-25">
+                <option value="">All Categories</option>
+                <?php foreach ($categories as $cat): ?>
+                <option value="<?= htmlspecialchars($cat) ?>"><?= ucwords($cat) ?></option>
+                <?php endforeach; ?>
             </select>
-            <select class="form-select w-25">
-                <option selected>Sort by</option>
-                <option>Price Low to High</option>
-                <option>Price High to Low</option>
+            <select id="sortSelect" class="form-select w-25">
+                <option selected disabled>Sort by</option>
+                <option value="low">Price Low to High</option>
+                <option value="high">Price High to Low</option>
             </select>
-            <button class="btn btn-outline-secondary">Reset</button>
+
+            <button class="btn btn-outline-secondary" id="resetFilters">Reset</button>
         </div>
     </div>
 
     <!-- SERVICE GRID -->
-    <div class="container py-5">
+    <div class="container py-5" data-aos="fade-up">
+        <p id="noResults" class="text-center text-muted mt-4" style="display: none;">
+            No services match your search.
+        </p>
+
         <div class="row g-4">
-            <?php foreach ($services as $s): ?>
-            <div class="col-md-6 col-lg-4">
+            <?php foreach ($services as $index => $s): ?>
+
+            <div class="col-md-6 col-lg-4 service-item" data-title="<?= strtolower($s['title']) ?>"
+                data-price="<?= $s['price'] ?>" data-category="<?= strtolower($s['category'] ?? '') ?>"
+                data-aos="zoom-in" data-aos-delay="<?= ($index + 1) * 100 ?>">
                 <div class="service-card">
-                    <img src="images/<?= $s['image'] ?: 'default.jpg' ?>" class="w-100" alt="<?= $s['title'] ?>">
+                    <img src="images/<?= $s['image'] ?: 'MeniandPedi.png' ?>" class="w-100" alt="<?= $s['title'] ?>"
+                        loading="lazy" width="100%" height="200">
+
+
                     <div class="p-4 d-flex flex-column">
                         <h5 class="fw-bold mb-2"><?= $s['title'] ?></h5>
                         <p class="small text-muted flex-grow-1"><?= $s['description'] ?></p>
                         <div class="d-flex justify-content-between align-items-center mt-2">
                             <span class="badge badge-price">$<?= number_format($s['price'], 2) ?></span>
-                            <a href="booking.php" class="btn btn-sm btn-book">Book Now</a>
+                            <a href="booking.php?service_id=<?= $s['id'] ?>" class="btn btn-sm btn-book">Book Now</a>
+
                         </div>
                     </div>
                 </div>
             </div>
+
             <?php endforeach; ?>
         </div>
-    </div>
+        <?php if ($totalPages > 1): ?>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+                <?php if ($page > 1): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?= $page - 1 ?>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <?php endif; ?>
 
-    <!-- TESTIMONIAL SECTION -->
-    <div class="container testimonial-card">
-        <h3 class="text-center mb-4">Client Testimonials</h3>
-        <div class="row">
-            <div class="col-md-4">
-                <p>“Amazing work! I’ve never felt more confident in my nails.”<br><strong>- Simran T.</strong></p>
-            </div>
-            <div class="col-md-4">
-                <p>“Super relaxing and professional. I love the vibe here.”<br><strong>- Neha G.</strong></p>
-            </div>
-            <div class="col-md-4">
-                <p>“Beautiful designs every time. Highly recommended!”<br><strong>- Riya K.</strong></p>
-            </div>
-        </div>
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                </li>
+                <?php endfor; ?>
+
+                <?php if ($page < $totalPages): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?= $page + 1 ?>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+        <?php endif; ?>
+
     </div>
 
     <!-- FAQ SECTION -->
-    <div class="container faqs">
+    <div class="container faqs" data-aos="fade-up">
         <h3 class="text-center mb-4">Frequently Asked Questions</h3>
         <div class="accordion" id="faqAccordion">
             <div class="accordion-item">
@@ -233,7 +279,7 @@ $services = $stmt->fetchAll();
     </div>
 
     <!-- CTA -->
-    <div class="container text-center cta-banner">
+    <div class="container text-center cta-banner" data-aos="zoom-in">
         <h3 class="fw-bold">Pamper Yourself Today</h3>
         <p>Ready for a transformation? Book your appointment online with GlamNail Studio!</p>
         <a href="booking.php" class="btn btn-book btn-lg">Book Now</a>
@@ -245,6 +291,85 @@ $services = $stmt->fetchAll();
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation JS -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const categorySelect = document.getElementById('categorySelect');
+            const sortSelect = document.getElementById('sortSelect');
+            const resetBtn = document.getElementById('resetFilters');
+            const serviceItems = Array.from(document.querySelectorAll('.service-item'));
+            const serviceGrid = document.querySelector('.row.g-4');
+            const noResults = document.getElementById('noResults');
+
+            function fadeIn(el) {
+                el.style.opacity = 0;
+                el.style.display = 'block';
+                let last = +new Date();
+                const tick = function() {
+                    el.style.opacity = +el.style.opacity + (new Date() - last) / 200;
+                    last = +new Date();
+                    if (+el.style.opacity < 1) {
+                        requestAnimationFrame(tick);
+                    }
+                };
+                tick();
+            }
+
+            function filterAndSort() {
+                const query = searchInput.value.toLowerCase();
+                const category = categorySelect.value.toLowerCase();
+                const sort = sortSelect.value;
+
+                let filtered = serviceItems.filter(item => {
+                    const title = item.getAttribute('data-title');
+                    const itemCategory = item.getAttribute('data-category');
+                    return title.includes(query) && (!category || itemCategory === category);
+                });
+
+                if (sort === 'low') {
+                    filtered.sort((a, b) => parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute(
+                        'data-price')));
+                } else if (sort === 'high') {
+                    filtered.sort((a, b) => parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute(
+                        'data-price')));
+                }
+
+                serviceGrid.innerHTML = '';
+                if (filtered.length === 0) {
+                    noResults.style.display = 'block';
+                } else {
+                    noResults.style.display = 'none';
+                    filtered.forEach(item => {
+                        item.style.opacity = 0;
+                        serviceGrid.appendChild(item);
+                        fadeIn(item);
+                    });
+                }
+            }
+
+            searchInput.addEventListener('input', filterAndSort);
+            categorySelect.addEventListener('change', filterAndSort);
+            sortSelect.addEventListener('change', filterAndSort);
+            resetBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                categorySelect.selectedIndex = 0;
+                sortSelect.selectedIndex = 0;
+                noResults.style.display = 'none';
+                serviceItems.forEach(item => {
+                    serviceGrid.appendChild(item);
+                    item.style.opacity = 1;
+                });
+            });
+        });
+    </script>
+
+
+
 </body>
 
 </html>
