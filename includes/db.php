@@ -1,16 +1,13 @@
 <?php
-// includes/db.php
+$host = getenv('DB_HOST');
+$port = getenv('DB_PORT') ?: 3306;
+$user = getenv('DB_USER');
+$pass = getenv('DB_PASS');
+$db = getenv('DB_NAME');
 
-$host = 'localhost';
-$dbname = 'glamnailstudio';
-$username = 'root'; // Change if using live host
-$password = ''; // Set password if needed
+$conn = new mysqli($host, $user, $pass, $db, $port);
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    // Enable exceptions
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die('Database Connection Failed: ' . $e->getMessage());
+if ($conn->connect_error) {
+    die('Database connection failed: ' . $conn->connect_error);
 }
 ?>
