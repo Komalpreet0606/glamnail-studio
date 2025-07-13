@@ -18,6 +18,10 @@ $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $services = $stmt->fetchAll();
 
+// ✅ FIX: move category fetch logic here
+$catStmt = $pdo->query('SELECT DISTINCT category FROM services');
+$categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
+
 ?>
 
 <!DOCTYPE html>
@@ -159,13 +163,13 @@ $services = $stmt->fetchAll();
     <div class="container" data-aos="fade-up">
         <div class="filter-bar shadow-sm d-flex justify-content-between align-items-center flex-wrap gap-3">
             <input type="text" id="searchInput" class="form-control w-25" placeholder="Search services...">
-
             <select id="categorySelect" class="form-select w-25">
                 <option value="">All Categories</option>
                 <?php foreach ($categories as $cat): ?>
                 <option value="<?= htmlspecialchars($cat) ?>"><?= ucwords($cat) ?></option>
                 <?php endforeach; ?>
             </select>
+
             <select id="sortSelect" class="form-select w-25">
                 <option selected disabled>Sort by</option>
                 <option value="low">Price Low to High</option>
