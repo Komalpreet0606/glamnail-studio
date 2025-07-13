@@ -4,6 +4,10 @@ FROM php:8.2-apache
 # Install mysqli extension
 RUN docker-php-ext-install mysqli
 
+# Install PDO and PDO MySQL extensions
+RUN docker-php-ext-install pdo pdo_mysql
+
+
 # Enable Apache mod_rewrite (optional but good)
 RUN a2enmod rewrite
 
