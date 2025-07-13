@@ -2,10 +2,8 @@
 session_start();
 require_once '../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+\Stripe\Stripe::setApiKey(getenv('STRIPE_SECRET_KEY')); // ⛔ Replace this with your real Stripe Secret Key
 
-\Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['customer'] = [
         'full_name' => $_POST['full_name'],

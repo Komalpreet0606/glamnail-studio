@@ -3,10 +3,8 @@ session_start();
 include 'includes/db.php';
 
 require_once 'vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__, '.env');
-$dotenv->load();
+\Stripe\Stripe::setApiKey(getenv('STRIPE_SECRET_KEY')); // Replace with your actual Stripe Secret Key
 
-\Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
 if (!isset($_GET['session_id']) || !isset($_SESSION['booking']) || !isset($_SESSION['customer'])) {
     $_SESSION['error'] = 'Something went wrong. Booking not confirmed.';
     header('Location: booking.php');
