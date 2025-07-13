@@ -64,8 +64,8 @@ $session = \Stripe\Checkout\Session::create([
         ],
     ],
     'mode' => 'payment',
-    'success_url' => 'http://localhost/glamnail-studio/success.php?session_id={CHECKOUT_SESSION_ID}',
-    'cancel_url' => 'http://localhost/glamnail-studio/cancel.php',
+    'success_url' => 'https://glamnail-studio.onrender.com/success.php?session_id={CHECKOUT_SESSION_ID}',
+    'cancel_url' => 'https://glamnail-studio.onrender.com/cancel.php',
 ]);
 
 header('Location: ' . $session->url);
