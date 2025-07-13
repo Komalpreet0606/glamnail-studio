@@ -1,11 +1,14 @@
-# Use an official PHP image with Apache
+# Use official PHP image with Apache
 FROM php:8.2-apache
 
-# Copy your code into the container
-COPY . /var/www/html/
+# Install mysqli extension
+RUN docker-php-ext-install mysqli
 
-# Enable Apache rewrite module (if needed)
+# Enable Apache mod_rewrite (optional but good)
 RUN a2enmod rewrite
 
-# Set permissions (optional if needed)
+# Copy project files into the container
+COPY . /var/www/html/
+
+# Set permissions (optional)
 RUN chown -R www-data:www-data /var/www/html
