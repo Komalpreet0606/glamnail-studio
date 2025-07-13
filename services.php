@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'includes/db.php';
+
 $limit = 6; // services per page
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
