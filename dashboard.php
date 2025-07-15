@@ -15,15 +15,12 @@ $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 
 // Appointments + payments
-$stmt = $pdo->prepare("
-    SELECT a.*, s.title AS service_title, ad.full_name, ad.phone, ad.address, p.amount, p.currency, p.payment_status, p.method_type, p.created_at
+$stmt = $pdo->prepare("SELECT a.*, s.title AS service_title, ad.full_name, ad.phone, ad.address, p.amount, p.currency, p.payment_status, p.method_type, p.created_at
     FROM appointments a
     JOIN services s ON a.service_id = s.id
     LEFT JOIN appointment_details ad ON a.id = ad.appointment_id
     LEFT JOIN payments p ON a.id = p.appointment_id
-    WHERE a.user_id = ?
-    ORDER BY a.appointment_date DESC, a.appointment_time DESC
-");
+    WHERE a.user_id = ? ORDER BY a.appointment_date DESC, a.appointment_time DESC");
 $stmt->execute([$user_id]);
 $appointments = $stmt->fetchAll();
 
@@ -43,21 +40,21 @@ foreach ($appointments as $a) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <title>User Dashboard - GlamNail Studio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: #f8f9fa;
-            font-family: 'Segoe UI', sans-serif;
+            background-color: #f7f8fa;
+            font-family: 'Lato', sans-serif;
         }
 
         .section {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             padding: 25px;
             margin-bottom: 30px;
         }
@@ -65,8 +62,14 @@ foreach ($appointments as $a) {
         .stat-box {
             background: #fff0f6;
             border-radius: 10px;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
         }
 
         .stat-box h4 {
@@ -78,13 +81,72 @@ foreach ($appointments as $a) {
         .badge {
             font-size: 0.85rem;
         }
+
+        .nav-tabs .nav-link {
+            border-radius: 8px;
+            margin: 0 5px;
+        }
+
+        .tab-content {
+            padding-top: 20px;
+        }
+
+        .tab-pane {
+            transition: opacity 0.5s ease;
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background-color: #d63384;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #a05566;
+        }
+
+        .list-group-item {
+            border-radius: 8px;
+        }
+
+        .toast {
+            border-radius: 8px;
+        }
+
+        .toast-body {
+            font-size: 1rem;
+            font-family: 'Lato', sans-serif;
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <?php include 'includes/navbar.php'; ?>
-    <div class="container mt-5">
 
+    <div class="container mt-5">
+        <!-- Success/Failure Alerts -->
         <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success"><?= $_SESSION['success'] ?></div>
         <?php unset($_SESSION['success']); ?>
@@ -92,9 +154,6 @@ foreach ($appointments as $a) {
         <div class="alert alert-danger"><?= $_SESSION['error'] ?></div>
         <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
-
-
-
 
         <!-- 📊 Quick Stats -->
         <div class="section row text-center">
@@ -120,22 +179,18 @@ foreach ($appointments as $a) {
                 <!-- Upcoming -->
                 <div class="tab-pane fade show active" id="upcoming">
                     <?php
-                $hasUpcoming = false;
-                foreach ($appointments as $a):
-                    if ($a['appointment_date'] >= date('Y-m-d')): $hasUpcoming = true; ?>
-                    <div class="card mb-3 shadow-sm">
+                    $hasUpcoming = false;
+                    foreach ($appointments as $a):
+                        if ($a['appointment_date'] >= date('Y-m-d')): $hasUpcoming = true; ?>
+                    <div class="card mb-3">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="mb-1"><?= htmlspecialchars($a['service_title']) ?></h5>
                                 <small><?= $a['appointment_date'] ?> @ <?= $a['appointment_time'] ?></small><br>
                                 <span
-                                    class="badge bg-<?= $a['payment_status'] === 'succeeded' ? 'success' : 'secondary' ?>">
-                                    <?= strtoupper($a['payment_status'] ?? 'Unpaid') ?>
-                                </span>
+                                    class="badge bg-<?= $a['payment_status'] === 'succeeded' ? 'success' : 'secondary' ?>"><?= strtoupper($a['payment_status'] ?? 'Unpaid') ?></span>
                                 <span
-                                    class="badge bg-<?= $a['status'] === 'cancelled' ? 'danger' : ($a['status'] === 'confirmed' ? 'primary' : 'warning') ?>">
-                                    <?= ucfirst($a['status']) ?>
-                                </span>
+                                    class="badge bg-<?= $a['status'] === 'cancelled' ? 'danger' : ($a['status'] === 'confirmed' ? 'primary' : 'warning') ?>"><?= ucfirst($a['status']) ?></span>
                             </div>
                             <div>
                                 <strong>$<?= number_format($a['final_price'], 2) ?></strong><br>
@@ -150,28 +205,25 @@ foreach ($appointments as $a) {
                         </div>
                     </div>
                     <?php endif; endforeach;
-                if (!$hasUpcoming) echo '<div class="alert alert-info">No upcoming appointments.</div>'; ?>
+                    if (!$hasUpcoming) echo '<div class="alert alert-info">No upcoming appointments.</div>';
+                    ?>
                 </div>
 
                 <!-- Past -->
                 <div class="tab-pane fade" id="past">
                     <?php
-                $hasPast = false;
-                foreach ($appointments as $a):
-                    if ($a['appointment_date'] < date('Y-m-d')): $hasPast = true; ?>
-                    <div class="card mb-3 shadow-sm">
+                    $hasPast = false;
+                    foreach ($appointments as $a):
+                        if ($a['appointment_date'] < date('Y-m-d')): $hasPast = true; ?>
+                    <div class="card mb-3">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="mb-1"><?= htmlspecialchars($a['service_title']) ?></h5>
                                 <small><?= $a['appointment_date'] ?> @ <?= $a['appointment_time'] ?></small><br>
                                 <span
-                                    class="badge bg-<?= $a['payment_status'] === 'succeeded' ? 'success' : 'secondary' ?>">
-                                    <?= strtoupper($a['payment_status'] ?? 'Unpaid') ?>
-                                </span>
+                                    class="badge bg-<?= $a['payment_status'] === 'succeeded' ? 'success' : 'secondary' ?>"><?= strtoupper($a['payment_status'] ?? 'Unpaid') ?></span>
                                 <span
-                                    class="badge bg-<?= $a['status'] === 'cancelled' ? 'danger' : ($a['status'] === 'confirmed' ? 'primary' : 'warning') ?>">
-                                    <?= ucfirst($a['status']) ?>
-                                </span>
+                                    class="badge bg-<?= $a['status'] === 'cancelled' ? 'danger' : ($a['status'] === 'confirmed' ? 'primary' : 'warning') ?>"><?= ucfirst($a['status']) ?></span>
                             </div>
                             <div>
                                 <strong>$<?= number_format($a['final_price'], 2) ?></strong>
@@ -179,7 +231,8 @@ foreach ($appointments as $a) {
                         </div>
                     </div>
                     <?php endif; endforeach;
-                if (!$hasPast) echo '<div class="alert alert-secondary">No past appointments.</div>'; ?>
+                    if (!$hasPast) echo '<div class="alert alert-secondary">No past appointments.</div>';
+                    ?>
                 </div>
             </div>
         </div>
