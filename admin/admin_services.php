@@ -71,7 +71,8 @@ $services = $pdo->query('SELECT * FROM services ORDER BY id DESC')->fetchAll();
                             <td><?= htmlspecialchars($s['title']) ?></td>
                             <td><?= htmlspecialchars($s['category']) ?></td>
                             <td><?= number_format($s['price'], 2) ?></td>
-                            <td><img src="../images/<?= $s['image'] ?>" class="thumb-img" alt="Service Image"></td>
+                            <td><img src="../images/<?= $s['image'] ?>" class="thumb-img" alt="Service Image"
+                                    loading="lazy"></td>
                             <td>
                                 <a href="edit_service.php?id=<?= $s['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
                                 <a href="delete_service.php?id=<?= $s['id'] ?>" class="btn btn-sm btn-danger"
