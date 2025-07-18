@@ -146,7 +146,7 @@ $profileImg = isset($_SESSION['profile_pic']) && $_SESSION['profile_pic'] != '' 
                 <?php endif; ?>
 
                 <div class="profile-card">
-                    <h3 class="text-center mb-4">👤 My Profile</h3>
+                    <h3 class="text-center mb-4"> My Profile</h3>
 
                     <div class="text-center mb-4">
                         <img src="<?= $profileImg ?>" class="profile-img shadow" alt="Profile Picture">

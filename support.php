@@ -77,7 +77,7 @@ include 'includes/db.php';
 
     <section class="support-hero">
         <div class="container">
-            <h1>We're Here to Help 💬</h1>
+            <h1>We're Here to Help</h1>
             <p class="lead">Have a question or concern? Reach out to us anytime!</p>
         </div>
     </section>
@@ -124,8 +124,10 @@ include 'includes/db.php';
         </div>
     </div>
 
+    <!-- FOOTER -->
     <footer class="bg-dark text-white text-center py-4">
         <p class="mb-0">&copy; <?= date('Y') ?> GlamNail Studio. All rights reserved.</p>
+        <small>Designed with <i class="bi bi-heart-fill text-danger"></i> by Team GlamNail</small>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

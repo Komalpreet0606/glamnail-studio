@@ -7,6 +7,7 @@ include '../includes/db.php';
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
+// Auth check
 if (!isset($_SESSION['jwt'])) {
     $_SESSION['error'] = '❌ Please log in to book.';
     header('Location: ../auth/login.php');
@@ -23,67 +24,84 @@ try {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $service_id = $_POST['service_id'];
-    $date = $_POST['appointment_date'];
-    $time = $_POST['appointment_time'];
+    $service_id = (int) ($_POST['service_id'] ?? 0);
+    $date = $_POST['appointment_date'] ?? '';
+    $time = $_POST['appointment_time'] ?? '';
     $discount_id = $_POST['discount_id'] ?? null;
 
-    // All the same validations from book_service.php
-    if (strtotime($date) < strtotime(date('Y-m-d'))) {
-        $_SESSION['error'] = '❌ Cannot book in the past.';
-        header('Location: ../booking.php');
-        exit();
-    }
+    $errors = [];
 
-    $hour = intval(date('H', strtotime($time)));
-    if ($hour < 10 || $hour >= 19) {
-        $_SESSION['error'] = '❌ Bookings allowed between 10 AM and 7 PM only.';
-        header('Location: ../booking.php');
-        exit();
-    }
-
-    $stmt = $pdo->prepare('SELECT COUNT(*) FROM holidays WHERE date = ?');
-    $stmt->execute([$date]);
-    if ($stmt->fetchColumn() > 0) {
-        $_SESSION['error'] = '❌ The studio is closed on this date.';
-        header('Location: ../booking.php');
-        exit();
-    }
-
+    // Service validation
     $stmt = $pdo->prepare('SELECT price FROM services WHERE id = ?');
     $stmt->execute([$service_id]);
-    $base_price = $stmt->fetchColumn();
-    if (!$base_price) {
-        $_SESSION['error'] = '❌ Invalid service.';
-        header('Location: ../booking.php');
-        exit();
+    $service = $stmt->fetchColumn();
+    if (!$service) {
+        $errors[] = '❌ Invalid service selected.';
     }
 
+    // Date validation
+    if (empty($date)) {
+        $errors[] = '❌ Appointment date is required.';
+    } elseif (strtotime($date) < strtotime(date('Y-m-d'))) {
+        $errors[] = '❌ Cannot book in the past.';
+    } else {
+        // Check holiday
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM holidays WHERE date = ?');
+        $stmt->execute([$date]);
+        if ($stmt->fetchColumn() > 0) {
+            $errors[] = '❌ The studio is closed on this date.';
+        }
+    }
+
+    // Time validation
+    if (empty($time)) {
+        $errors[] = '❌ Appointment time is required.';
+    } else {
+        $hour = intval(date('H', strtotime($time)));
+        $minute = intval(date('i', strtotime($time)));
+        if ($hour < 10 || $hour >= 19) {
+            $errors[] = '❌ Bookings allowed between 10 AM and 7 PM only.';
+        } elseif ($minute % 15 !== 0) {
+            $errors[] = '❌ Please choose a time in 15-minute intervals.';
+        }
+    }
+
+    // Optional discount validation
+    if (!empty($discount_id)) {
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM discounts WHERE id = ? AND valid_from <= ? AND valid_to >= ?');
+        $stmt->execute([$discount_id, $date, $date]);
+        if ($stmt->fetchColumn() == 0) {
+            $errors[] = '❌ Selected discount is not valid for this date.';
+        }
+    }
+
+    // Duplicate checks
     $stmt = $pdo->prepare('SELECT COUNT(*) FROM appointments WHERE appointment_date = ? AND appointment_time = ?');
     $stmt->execute([$date, $time]);
     if ($stmt->fetchColumn() > 0) {
-        $_SESSION['error'] = '❌ Time slot already booked.';
-        header('Location: ../booking.php');
-        exit();
+        $errors[] = '❌ Time slot already booked.';
     }
 
     $stmt = $pdo->prepare('SELECT COUNT(*) FROM appointments WHERE user_id = ? AND appointment_date = ? AND appointment_time = ?');
     $stmt->execute([$user_id, $date, $time]);
     if ($stmt->fetchColumn() > 0) {
-        $_SESSION['error'] = '❌ You already have a booking at this time.';
-        header('Location: ../booking.php');
-        exit();
+        $errors[] = '❌ You already have a booking at this time.';
     }
 
     $stmt = $pdo->prepare('SELECT COUNT(*) FROM appointments WHERE user_id = ? AND appointment_date = ?');
     $stmt->execute([$user_id, $date]);
     if ($stmt->fetchColumn() >= 1) {
-        $_SESSION['error'] = '❌ You can only book 1 appointment per day.';
+        $errors[] = '❌ You can only book one appointment per day.';
+    }
+
+    // Handle errors
+    if (!empty($errors)) {
+        $_SESSION['error'] = implode('<br>', $errors);
         header('Location: ../booking.php');
         exit();
     }
 
-    // Passed ✅ → Save to session and go to checkout
+    // ✅ All good – store booking temporarily
     $_SESSION['booking'] = [
         'service_id' => $service_id,
         'appointment_date' => $date,

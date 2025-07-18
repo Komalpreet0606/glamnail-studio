@@ -129,7 +129,7 @@ $offers = $stmt2->fetchAll();
 
     <section class="booking-hero">
         <div class="container">
-            <h1>Schedule Your Glam Session 💅</h1>
+            <h1>Schedule Your Glam Session</h1>
             <p class="lead">Pick your service, select a time, and let's glam you up!</p>
         </div>
     </section>
@@ -162,7 +162,7 @@ $offers = $stmt2->fetchAll();
 
                 <div class="mb-3">
                     <label class="form-label"><i class="bi bi-stars"></i> Select Service</label>
-                    <select name="service_id" id="serviceSelect" class="form-select" required>
+                    <select name="service_id" id="serviceSelect" class="form-select">
                         <option value="">-- Choose a service --</option>
                         <?php foreach ($services as $s): ?>
                         <option value="<?= $s['id'] ?>" data-price="<?= $s['price'] ?>"
@@ -189,13 +189,12 @@ $offers = $stmt2->fetchAll();
 
                 <div class="mb-3">
                     <label class="form-label"><i class="bi bi-calendar-event"></i> Preferred Date</label>
-                    <input type="date" name="appointment_date" class="form-control" required
-                        min="<?= date('Y-m-d') ?>">
+                    <input type="date" name="appointment_date" class="form-control" min="<?= date('Y-m-d') ?>">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label"><i class="bi bi-clock-fill"></i> Preferred Time</label>
-                    <input type="time" name="appointment_time" class="form-control" required>
+                    <input type="time" name="appointment_time" class="form-control">
                     <small class="text-muted">Bookings only allowed between 10:00 AM and 7:00 PM</small>
                 </div>
 
@@ -217,8 +216,10 @@ $offers = $stmt2->fetchAll();
         </div>
     </div>
 
-    <footer class="bg-dark text-white text-center py-4 mt-5">
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white text-center py-4">
         <p class="mb-0">&copy; <?= date('Y') ?> GlamNail Studio. All rights reserved.</p>
+        <small>Designed with <i class="bi bi-heart-fill text-danger"></i> by Team GlamNail</small>
     </footer>
 
     <script>

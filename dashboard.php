@@ -239,7 +239,7 @@ foreach ($appointments as $a) {
 
         <!-- 💳 Latest Payment -->
         <div class="section">
-            <h4>💳 Latest Payment</h4>
+            <h4>Latest Payment</h4>
             <?php if ($latestPayment): ?>
             <ul class="list-group">
                 <li class="list-group-item"><strong>Service:</strong> <?= $latestPayment['service_title'] ?></li>

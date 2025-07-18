@@ -4,8 +4,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 include 'includes/db.php';
 $today = date('Y-m-d');
-$stmt = $pdo->prepare('SELECT * FROM discounts WHERE valid_from <= ? AND valid_to >= ?');
-$stmt->execute([$today, $today]);
+$stmt = $pdo->prepare('SELECT * FROM discounts WHERE valid_from <= ? AND valid_to >= ? AND title LIKE ?');
+$stmt->execute([$today, $today, '%Special%']);
 $offers = $stmt->fetchAll();
 ?>
 
@@ -186,6 +186,69 @@ $offers = $stmt->fetchAll();
             box-shadow: 0 6px 18px rgba(214, 105, 181, 0.6);
             transform: translateY(-2px);
         }
+
+        .text-pink {
+            color: #d63384 !important;
+        }
+
+        .hero-heading {
+            color: #fff;
+            font-weight: 700;
+            text-shadow:
+                2px 2px 6px rgba(0, 0, 0, 0.6),
+                0 0 12px rgba(183, 110, 121, 0.4);
+            /* subtle glam glow */
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #ffb6d2, #b76e79);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 3rem;
+            animation: glamPulse 3s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .hero-heading {
+                font-size: 2rem;
+            }
+        }
+
+        @keyframes glamPulse {
+            0% {
+                text-shadow: 0 0 8px rgba(214, 105, 181, 0.3);
+            }
+
+            50% {
+                text-shadow: 0 0 14px rgba(214, 105, 181, 0.6);
+            }
+
+            100% {
+                text-shadow: 0 0 8px rgba(214, 105, 181, 0.3);
+            }
+        }
+
+        .hero-content {
+            background: rgba(0, 0, 0, 0.4);
+            /* dark overlay */
+            padding: 40px 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(6px);
+            /* frosted glass effect */
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            color: #fff;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #fff;
+            font-weight: 300;
+        }
     </style>
 </head>
 
@@ -196,15 +259,19 @@ $offers = $stmt->fetchAll();
 
     <!-- HERO -->
     <section class="hero">
-        <h1 class="display-4 fw-bold">Your Glam Journey Begins Here 💅</h1>
-        <p class="lead">Elegant nails, relaxing experience, unforgettable service.</p>
-        <a href="booking.php" class="btn btn-cta btn-lg mt-3 px-4">Book Your Appointment</a>
+        <div class="hero-content text-center">
+            <h1 class="display-4 fw-bold">Your Glam Journey Begins Here</h1>
+            <p class="lead">Elegant nails, relaxing experience, unforgettable service.</p>
+            <a href="booking.php" class="btn btn-cta btn-lg mt-3 px-4">Book Your Appointment</a>
+        </div>
     </section>
+
 
     <!-- OFFERS -->
     <div class="container py-5" data-aos="fade-up">
-        <h2 class="text-center section-title">🎁 Special Offers</h2>
-        <?php if (count($offers) > 0): ?>
+        <h2 class="text-center section-title">
+            <i class="bi bi-gift-fill text-danger fs-3 me-2"></i>Special Offers
+        </h2> <?php if (count($offers) > 0): ?>
         <div class="row justify-content-center">
             <?php foreach ($offers as $offer): ?>
             <div class="col-md-6 mb-3">
@@ -222,7 +289,9 @@ $offers = $stmt->fetchAll();
 
     <!-- FEATURED SERVICES -->
     <div class="container services-preview mb-5" data-aos="fade-up">
-        <h2 class="text-center section-title">💎 Featured Services</h2>
+        <h2 class="text-center section-title">
+            <i class="bi bi-gem text-primary fs-3 me-2"></i>Featured Services
+        </h2>
         <div class="row g-4">
             <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
                 <div class="card h-100 service-card">
@@ -260,7 +329,9 @@ $offers = $stmt->fetchAll();
 
     <!-- WHY US -->
     <div class="container my-5" data-aos="fade-up">
-        <h2 class="text-center section-title">🌟 Why GlamNail?</h2>
+        <h2 class="text-center section-title">
+            <i class="bi bi-stars text-warning fs-3 me-2"></i>Why GlamNail?
+        </h2>
         <div class="row text-center">
             <div class="col-md-4">
                 <i class="bi bi-star-fill fs-2 text-warning"></i>
@@ -282,7 +353,9 @@ $offers = $stmt->fetchAll();
 
     <!-- TESTIMONIALS -->
     <div class="container py-5" data-aos="fade-up">
-        <h2 class="text-center section-title">💬 What Clients Say</h2>
+        <h2 class="text-center section-title">
+            <i class="bi bi-chat-left-quote-fill text-secondary fs-3 me-2"></i>What Clients Say
+        </h2>
         <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
 
@@ -327,7 +400,9 @@ $offers = $stmt->fetchAll();
 
     <!-- GALLERY -->
     <div class="container my-5" data-aos="fade-up">
-        <h2 class="text-center section-title">📸 Our Gallery</h2>
+        <h2 class="text-center section-title">
+            <i class="bi bi-camera-fill text-info fs-3 me-2"></i>Our Gallery
+        </h2>
         <div class="row gallery g-3">
             <div class="col-md-3"><img src="images/gallery_1.jpg" alt="Design 1" loading="lazy"></div>
             <div class="col-md-3"><img src="images/gallery_2.jpg" alt="Design 2" loading="lazy"></div>
@@ -349,7 +424,7 @@ $offers = $stmt->fetchAll();
     <!-- FOOTER -->
     <footer class="bg-dark text-white text-center py-4">
         <p class="mb-0">&copy; <?= date('Y') ?> GlamNail Studio. All rights reserved.</p>
-        <small>Designed with 💖 by Team GlamNail</small>
+        <small>Designed with <i class="bi bi-heart-fill text-danger"></i> by Team GlamNail</small>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

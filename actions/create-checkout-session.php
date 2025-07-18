@@ -2,15 +2,37 @@
 session_start();
 require_once '../vendor/autoload.php';
 
-\Stripe\Stripe::setApiKey(getenv('STRIPE_SECRET_KEY')); // ⛔ Replace this with your real Stripe Secret Key
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
+\Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    function clean($input)
+    {
+        return htmlspecialchars(trim($input));
+    }
+
+    $fullName = clean($_POST['full_name'] ?? '');
+    $email = clean($_POST['email'] ?? '');
+    $phone = clean($_POST['phone'] ?? '');
+    $address = clean($_POST['address'] ?? '');
+    $note = clean($_POST['note'] ?? '');
+
+    // Basic validations
+    if (empty($fullName) || strlen($fullName) < 3 || strlen($fullName) > 100 || !filter_var($email, FILTER_VALIDATE_EMAIL) || empty($phone) || !preg_match('/^[0-9\-\+\s\(\)]+$/', $phone) || empty($address) || strlen($address) < 10) {
+        $_SESSION['error'] = '❌ Please fill all fields correctly.';
+        header('Location: ../checkout.php');
+        exit();
+    }
+
+    // Save validated inputs
     $_SESSION['customer'] = [
-        'full_name' => $_POST['full_name'],
-        'email' => $_POST['email'],
-        'phone' => $_POST['phone'],
-        'address' => $_POST['address'],
-        'note' => $_POST['note'] ?? '',
+        'full_name' => $fullName,
+        'email' => $email,
+        'phone' => $phone,
+        'address' => $address,
+        'note' => $note,
     ];
 }
 
