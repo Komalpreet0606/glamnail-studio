@@ -296,7 +296,7 @@ $offers = $stmt->fetchAll();
             <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
                 <div class="card h-100 service-card">
 
-                    <img src="images/MeniandPedi.png" class="card-img-top" alt="Mani Pedi" loading="lazy">
+                    <img src="images/MeniandPedi.jpg" class="card-img-top" alt="Mani Pedi" loading="lazy">
                     <div class="card-body">
                         <h5 class="card-title">Manicure & Pedicure</h5>
                         <p class="card-text">A relaxing and rejuvenating treatment for hands and feet.</p>
