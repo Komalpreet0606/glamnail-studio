@@ -117,6 +117,23 @@
                 </a>
             </div>
 
+            <?php session_start(); ?>
+            <?php if (!empty($_SESSION['success'])): ?>
+            <div class="alert alert-success text-center">
+                <?= $_SESSION['success'] ?>
+                <?php unset($_SESSION['success']); ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if (!empty($_SESSION['error'])): ?>
+            <div class="alert alert-danger text-center">
+                <?= $_SESSION['error'] ?>
+                <?php unset($_SESSION['error']); ?>
+            </div>
+            <?php endif; ?>
+
+
+
             <h2 class="card-title">Sign Up to GlamNail Studio</h2>
 
             <form action="../actions/register_process.php" method="POST">

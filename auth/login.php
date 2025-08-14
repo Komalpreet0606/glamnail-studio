@@ -118,6 +118,12 @@
                     <img src="../images/logo.png" alt="GlamNail Studio Logo" class="logo">
                 </a>
             </div>
+            <?php if (!empty($_SESSION['error'])): ?>
+            <div class="alert alert-danger text-center">
+                <?= $_SESSION['error'] ?>
+            </div>
+            <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
 
             <h2 class="card-title">Login to GlamNail Studio</h2>
 
