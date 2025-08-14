@@ -17,10 +17,6 @@ $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $services = $stmt->fetchAll();
-$imageUrl = $s['image'];
-if (!preg_match('/^https?:\/\//', $imageUrl)) {
-    $imageUrl = 'images/' . ($imageUrl ?: 'MeniandPedi.png');
-}
 
 // ✅ FIX: move category fetch logic here
 $catStmt = $pdo->query('SELECT DISTINCT category FROM services');
@@ -192,7 +188,12 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
 
         <div class="row g-4">
             <?php foreach ($services as $index => $s): ?>
-
+            <?php
+            $imageUrl = $s['image'];
+            if (!preg_match('/^https?:\/\//', $imageUrl)) {
+                $imageUrl = 'images/' . ($imageUrl ?: 'MeniandPedi.png');
+            }
+            ?>
             <div class="col-md-6 col-lg-4 service-item" data-title="<?= strtolower($s['title']) ?>"
                 data-price="<?= $s['price'] ?>" data-category="<?= strtolower($s['category'] ?? '') ?>"
                 data-aos="zoom-in" data-aos-delay="<?= ($index + 1) * 100 ?>">

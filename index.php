@@ -310,7 +310,7 @@ $offers = $stmt->fetchAll();
             </div>
             <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
                 <div class="card h-100 service-card">
-                    <img src="images/Shellac.png" class="card-img-top" alt="Shellac" loading="lazy">
+                    <img src="images/Shellac.jpg" class="card-img-top" alt="Shellac" loading="lazy">
                     <div class="card-body">
                         <h5 class="card-title">Shellac Nails</h5>
                         <p class="card-text">Glossy, long-lasting nails with UV protection and shine.</p>
@@ -319,7 +319,7 @@ $offers = $stmt->fetchAll();
             </div>
             <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
                 <div class="card h-100 service-card">
-                    <img src="images/Pedicure.png" class="card-img-top" alt="Nail Art" loading="lazy">
+                    <img src="images/Pedicure.jpg" class="card-img-top" alt="Nail Art" loading="lazy">
                     <div class="card-body">
                         <h5 class="card-title">Creative Nail Art</h5>
                         <p class="card-text">Stand out with personalized nail designs & brush art.</p>
