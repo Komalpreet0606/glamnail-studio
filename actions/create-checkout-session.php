@@ -2,10 +2,19 @@
 session_start();
 require_once '../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+$root = dirname(__DIR__);
+if (is_file($root . '/.env')) {
+    // Local/dev: load from .env if it exists
+    Dotenv\Dotenv::createImmutable($root)->safeLoad(); // ✅ no exception if missing
+}
 
-\Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+// Read secrets from platform env (Render/Railway)
+$stripeSecret = $_ENV['STRIPE_SECRET_KEY'] ?? (getenv('STRIPE_SECRET_KEY') ?? '');
+if (!$stripeSecret) {
+    http_response_code(500);
+    exit('Missing STRIPE_SECRET_KEY'); // helps you catch misconfigured env
+}
+$stripe = new \Stripe\StripeClient($stripeSecret);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     function clean($input)
