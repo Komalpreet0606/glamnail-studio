@@ -1,8 +1,11 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 include '../includes/db.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+$root = dirname(__DIR__);
+if (is_file($root . '/.env')) {
+    // Local/dev: load from .env if it exists
+    Dotenv\Dotenv::createImmutable($root)->safeLoad(); // ✅ no exception if missing
+}
 use Cloudinary\Cloudinary;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
