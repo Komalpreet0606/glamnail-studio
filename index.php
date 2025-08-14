@@ -249,6 +249,11 @@ $offers = $stmt->fetchAll();
             color: #fff;
             font-weight: 300;
         }
+
+        .card-img-top {
+            height: 250px;
+            object-fit: cover;
+        }
     </style>
 </head>
 
