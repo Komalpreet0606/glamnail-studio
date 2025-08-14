@@ -9,12 +9,15 @@ if (is_file($root . '/.env')) {
 }
 
 // Read secrets from platform env (Render/Railway)
-$stripeSecret = $_ENV['STRIPE_SECRET_KEY'] ?? (getenv('STRIPE_SECRET_KEY') ?? '');
-if (!$stripeSecret) {
+// Load API key
+$secretKey = $_ENV['STRIPE_SECRET_KEY'] ?? (getenv('STRIPE_SECRET_KEY') ?? '');
+if (!$secretKey) {
     http_response_code(500);
-    exit('Missing STRIPE_SECRET_KEY'); // helps you catch misconfigured env
+    exit('Missing STRIPE_SECRET_KEY in environment');
 }
-$stripe = new \Stripe\StripeClient($stripeSecret);
+
+// Set the API key for all future Stripe calls
+\Stripe\Stripe::setApiKey($secretKey);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     function clean($input)
