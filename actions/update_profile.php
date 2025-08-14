@@ -4,7 +4,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 include '../includes/db.php';
 
 use Cloudinary\Cloudinary;
-
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php');
     exit();

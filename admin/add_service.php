@@ -2,7 +2,8 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 include '../includes/db.php';
 use Cloudinary\Cloudinary;
-
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 $cloudinary = new Cloudinary([
     'cloud' => [
         'cloud_name' => $_ENV['CLOUDINARY_CLOUD_NAME'],
