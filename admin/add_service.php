@@ -9,17 +9,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $imageName = 'default.jpg';
     if (!empty($_FILES['image']['name'])) {
-        $targetDir = '../images/';
-        $imageName = time() . '_' . basename($_FILES['image']['name']);
-        $targetFile = $targetDir . $imageName;
+        $fsDir = realpath(__DIR__ . '/../images');
+        if ($fsDir === false) {
+            $fsDir = __DIR__ . '/../images';
+        }
+        if (!is_dir($fsDir)) {
+            @mkdir($fsDir, 0775, true);
+        }
 
+        $imageFile = $_FILES['image'];
+        $ext = strtolower(pathinfo($imageFile['name'], PATHINFO_EXTENSION));
         $allowed = ['jpg', 'jpeg', 'png', 'webp'];
-        $ext = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-        if (in_array($ext, $allowed) && $_FILES['image']['size'] <= 2 * 1024 * 1024) {
-            move_uploaded_file($_FILES['image']['tmp_name'], $targetFile);
-        } else {
-            $imageName = 'default.jpg'; // fallback
+        if (in_array($ext, $allowed, true) && $imageFile['size'] <= 2 * 1024 * 1024) {
+            $base = preg_replace('/[^A-Za-z0-9_.-]/', '_', pathinfo($imageFile['name'], PATHINFO_FILENAME));
+            $base = preg_replace('/_+/', '_', $base);
+            $imageName = time() . '_' . $base . '.' . $ext;
+
+            $dest = rtrim($fsDir, '/\\') . DIRECTORY_SEPARATOR . $imageName;
+            if (!move_uploaded_file($imageFile['tmp_name'], $dest)) {
+                $imageName = 'default.jpg';
+            }
         }
     }
 

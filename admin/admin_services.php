@@ -75,7 +75,7 @@ $services = $pdo->query('SELECT * FROM services ORDER BY id DESC')->fetchAll();
                                     loading="lazy"></td>
                             <td>
                                 <a href="edit_service.php?id=<?= $s['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-                                <a href="delete_service.php?id=<?= $s['id'] ?>" class="btn btn-sm btn-danger"
+                                <a href="../actions/delete_service.php?id=<?= $s['id'] ?>" class="btn btn-sm btn-danger"
                                     onclick="return confirm('Are you sure you want to delete this service?')">Delete</a>
                             </td>
                         </tr>
