@@ -118,14 +118,15 @@
                     <img src="../images/logo.png" alt="GlamNail Studio Logo" class="logo">
                 </a>
             </div>
+
+
+            <h2 class="card-title">Login to GlamNail Studio</h2>
             <?php if (!empty($_SESSION['error'])): ?>
             <div class="alert alert-danger text-center">
                 <?= $_SESSION['error'] ?>
+                <?php unset($_SESSION['error']); ?>
             </div>
-            <?php unset($_SESSION['error']); ?>
             <?php endif; ?>
-
-            <h2 class="card-title">Login to GlamNail Studio</h2>
 
             <form action="../actions/login_process.php" method="POST">
                 <div class="mb-3">

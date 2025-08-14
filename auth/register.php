@@ -117,7 +117,10 @@
                 </a>
             </div>
 
-            <?php session_start(); ?>
+
+
+            <h2 class="card-title">Sign Up to GlamNail Studio</h2>
+
             <?php if (!empty($_SESSION['success'])): ?>
             <div class="alert alert-success text-center">
                 <?= $_SESSION['success'] ?>
@@ -131,10 +134,6 @@
                 <?php unset($_SESSION['error']); ?>
             </div>
             <?php endif; ?>
-
-
-
-            <h2 class="card-title">Sign Up to GlamNail Studio</h2>
 
             <form action="../actions/register_process.php" method="POST">
                 <div class="mb-3">
