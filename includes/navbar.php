@@ -9,7 +9,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <div class="container">
         <!-- Logo section -->
         <a class="navbar-brand fw-bold d-flex align-items-center" href="index.php">
-            <img src="./images/logo.jpg" alt="GlamNail Studio Logo" style="height: 40px; margin-right: 10px;">
+            <img src="./images/logo.png" alt="GlamNail Studio Logo" style="height: 40px; margin-right: 10px;">
             GlamNail Studio
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

@@ -21,3 +21,8 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
+
+# ensure images dir exists and is writable
+RUN mkdir -p /var/www/html/images \
+ && chown -R www-data:www-data /var/www/html/images \
+ && chmod -R 775 /var/www/html/images

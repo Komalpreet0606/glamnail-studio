@@ -113,7 +113,7 @@
         <div class="card" data-aos="fade-up" data-aos-delay="300">
             <div class="text-center mb-4">
                 <a href="../index.php">
-                    <img src="../images/logo.jpg" alt="GlamNail Studio Logo" class="logo">
+                    <img src="../images/logo.png" alt="GlamNail Studio Logo" class="logo">
                 </a>
             </div>
 
