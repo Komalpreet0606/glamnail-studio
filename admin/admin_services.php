@@ -71,8 +71,17 @@ $services = $pdo->query('SELECT * FROM services ORDER BY id DESC')->fetchAll();
                             <td><?= htmlspecialchars($s['title']) ?></td>
                             <td><?= htmlspecialchars($s['category']) ?></td>
                             <td><?= number_format($s['price'], 2) ?></td>
-                            <td><img src="../images/<?= $s['image'] ?>" class="thumb-img" alt="Service Image"
-                                    loading="lazy"></td>
+                            <td>
+                                <?php
+                                $imgSrc = $s['image'];
+                                // If not full URL, assume it's a local file
+                                if (!preg_match('/^https?:\/\//', $imgSrc)) {
+                                    $imgSrc = '../images/' . $imgSrc;
+                                }
+                                ?>
+                                <img src="<?= $imgSrc ?>" alt="Service" class="thumb-img" loading="lazy">
+                            </td>
+
                             <td>
                                 <a href="edit_service.php?id=<?= $s['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
                                 <a href="../actions/delete_service.php?id=<?= $s['id'] ?>" class="btn btn-sm btn-danger"

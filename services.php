@@ -17,6 +17,10 @@ $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $services = $stmt->fetchAll();
+$imageUrl = $s['image'];
+if (!preg_match('/^https?:\/\//', $imageUrl)) {
+    $imageUrl = 'images/' . ($imageUrl ?: 'MeniandPedi.png');
+}
 
 // ✅ FIX: move category fetch logic here
 $catStmt = $pdo->query('SELECT DISTINCT category FROM services');
@@ -193,8 +197,8 @@ $categories = $catStmt->fetchAll(PDO::FETCH_COLUMN);
                 data-price="<?= $s['price'] ?>" data-category="<?= strtolower($s['category'] ?? '') ?>"
                 data-aos="zoom-in" data-aos-delay="<?= ($index + 1) * 100 ?>">
                 <div class="service-card">
-                    <img src="images/<?= $s['image'] ?: 'MeniandPedi.png' ?>" class="w-100" alt="<?= $s['title'] ?>"
-                        loading="lazy" width="100%" height="200">
+                    <img src="<?= htmlspecialchars($imageUrl) ?>" class="w-100"
+                        alt="<?= htmlspecialchars($s['title']) ?>" loading="lazy" width="100%" height="200">
 
 
                     <div class="p-4 d-flex flex-column">

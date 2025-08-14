@@ -1,49 +1,58 @@
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
 include '../includes/db.php';
+
+use Cloudinary\Cloudinary;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id']);
     $title = trim($_POST['title']);
     $desc = trim($_POST['description']);
     $price = floatval($_POST['price']);
-    $oldImage = $_POST['old_image'];
+    $oldImage = $_POST['old_image'] ?? '';
 
-    $newImageName = $oldImage;
+    $cloudinary = new Cloudinary([
+        'cloud' => [
+            'cloud_name' => $_ENV['CLOUDINARY_CLOUD_NAME'],
+            'api_key' => $_ENV['CLOUDINARY_API_KEY'],
+            'api_secret' => $_ENV['CLOUDINARY_API_SECRET'],
+        ],
+    ]);
+
+    $newImageUrl = $oldImage;
+
+    // Check if new image is uploaded
     if (!empty($_FILES['image']['name'])) {
-        $fsDir = realpath(__DIR__ . '/../images');
-        if ($fsDir === false) {
-            $fsDir = __DIR__ . '/../images';
-        }
-        if (!is_dir($fsDir)) {
-            @mkdir($fsDir, 0775, true);
-        }
-
-        $imageFile = $_FILES['image'];
-        $ext = strtolower(pathinfo($imageFile['name'], PATHINFO_EXTENSION));
+        $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
         $allowed = ['jpg', 'jpeg', 'png', 'webp'];
 
-        if (in_array($ext, $allowed, true) && $imageFile['size'] <= 2 * 1024 * 1024) {
-            $base = preg_replace('/[^A-Za-z0-9_.-]/', '_', pathinfo($imageFile['name'], PATHINFO_FILENAME));
-            $base = preg_replace('/_+/', '_', $base);
-            $newImageName = time() . '_' . $base . '.' . $ext;
+        if (in_array($ext, $allowed, true) && $_FILES['image']['size'] <= 2 * 1024 * 1024) {
+            try {
+                // Upload new image
+                $uploadResult = $cloudinary->uploadApi()->upload($_FILES['image']['tmp_name'], [
+                    'folder' => 'glamnail_services',
+                    'overwrite' => false,
+                    'resource_type' => 'image',
+                ]);
 
-            $dest = rtrim($fsDir, '/\\') . DIRECTORY_SEPARATOR . $newImageName;
-            if (!move_uploaded_file($imageFile['tmp_name'], $dest)) {
-                $newImageName = $oldImage; // keep old on failure
-            } else {
-                // Optionally delete old image if replaced
-                if ($oldImage && $oldImage !== $newImageName) {
-                    $oldPath = rtrim($fsDir, '/\\') . DIRECTORY_SEPARATOR . $oldImage;
-                    if (is_file($oldPath)) {
-                        @unlink($oldPath);
-                    }
+                $newImageUrl = $uploadResult['secure_url'];
+
+                // Optional: delete old image from Cloudinary if it was hosted there
+                if (strpos($oldImage, 'res.cloudinary.com') !== false) {
+                    $publicId = basename(parse_url($oldImage, PHP_URL_PATH), '.' . $ext);
+                    $publicId = 'glamnail_services/' . $publicId;
+                    $cloudinary->uploadApi()->destroy($publicId);
                 }
+            } catch (Exception $e) {
+                // If upload fails, retain the old image
+                $newImageUrl = $oldImage;
             }
         }
     }
 
+    // Update DB
     $stmt = $pdo->prepare('UPDATE services SET title = ?, description = ?, price = ?, image = ? WHERE id = ?');
-    $stmt->execute([$title, $desc, $price, $newImageName, $id]);
+    $stmt->execute([$title, $desc, $price, $newImageUrl, $id]);
 
     header('Location: ../admin/admin_services.php');
     exit();
