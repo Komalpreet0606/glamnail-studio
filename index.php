@@ -27,7 +27,7 @@ $offers = $stmt->fetchAll();
     <style>
         body {
             font-family: 'Lato', sans-serif;
-            color: #000;
+            color: #333;
             background-color: #fffafc;
         }
 
